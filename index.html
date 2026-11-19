@@ -1,122 +1,200 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#10101a">
-  <meta name="description" content="Turn long videos into short clips with AI.">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <title>ClipMagic AI</title>
-  <style>
-    :root{color-scheme:dark;--bg:#10101a;--panel:#202033;--muted:#aaa9bc;--purple:#b99aff;--line:#343449}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f7f5ff;font:16px system-ui,-apple-system,Segoe UI,sans-serif}
-    main{max-width:620px;margin:auto;padding:22px 18px 48px}
-    header{display:flex;align-items:center;justify-content:space-between;margin:8px 0 24px}
-    .brand{font-weight:850;font-size:22px;letter-spacing:-.5px}.spark{color:var(--purple)}
-    .hero{padding:25px 22px;border-radius:24px;background:linear-gradient(135deg,#392365,#19192e);margin-bottom:24px}
-    h1{font-size:32px;line-height:1.08;margin:0 0 12px}.hero p{color:#ddd5f5;line-height:1.5;margin:0}
-    label{display:block;font-size:12px;letter-spacing:1.2px;color:#c7c4d7;font-weight:700;margin:18px 0 8px}
-    input,select{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;color:white;font-size:16px;outline:none}
-    input:focus,select:focus{border-color:var(--purple)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    button{width:100%;border:0;border-radius:15px;padding:16px;background:linear-gradient(90deg,#8e5cf6,#b16cff);color:white;font-weight:800;font-size:15px;margin-top:22px}
-    button:disabled{opacity:.55}
-    .hint,.small{color:var(--muted);font-size:12px;line-height:1.5}
-    .status{padding:14px;border:1px solid var(--line);border-radius:14px;margin-top:16px;background:#171725;display:none;line-height:1.5}
-    .error{color:#ff9999}.clips{margin-top:24px}.clip{background:var(--panel);border:1px solid var(--line);padding:14px;border-radius:16px;margin:10px 0;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .clip button{width:auto;margin:0;padding:10px 13px;font-size:13px;white-space:nowrap}
-    .clipname{font-weight:700}.clipmeta{font-size:12px;color:var(--muted);margin-top:4px}
-    footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
-    details{margin-top:18px;color:var(--muted);font-size:13px}summary{cursor:pointer}
-    @media(max-width:360px){h1{font-size:28px}.grid{grid-template-columns:1fr}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10101b">
+<title>ClipMagic AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#10101b;color:#fff;font-family:Arial,sans-serif;padding:22px}
+.container{max-width:520px;margin:auto}
+h1{font-size:30px;margin-bottom:6px}
+.sub{color:#aaa;margin-bottom:25px}
+.card{background:#1c1c2b;padding:20px;border-radius:16px;margin-bottom:16px}
+label{display:block;margin:15px 0 8px;font-size:14px;color:#ddd}
+input,select,button{width:100%;padding:14px;border-radius:10px;border:1px solid #444;background:#29293b;color:white;font-size:15px}
+input[type=file]{padding:10px}
+button{background:#7857ff;border:0;font-weight:bold;margin-top:18px;cursor:pointer}
+button:disabled{opacity:.5}
+.secondary{background:#343448}
+.small{font-size:12px;color:#aaa;margin-top:8px}
+#status{margin-top:16px;white-space:pre-wrap;color:#d7ccff}
+a{color:#a994ff}
+.hidden{display:none}
+</style>
 </head>
 <body>
-<main>
-  <header><div class="brand">ClipMagic <span class="spark">✦ AI</span></div><span aria-hidden="true">✂️</span></header>
-  <section class="hero">
-    <h1>Long video in.<br><span class="spark">Short clips out.</span></h1>
-    <p>Paste a video link. AI finds spoken highlights, creates vertical clips and adds subtitles.</p>
-  </section>
+<div class="container">
+<h1>✨ ClipMagic AI</h1>
+<div class="sub">Turn long videos into short clips automatically.</div>
 
-  <label for="videoUrl">VIDEO LINK</label>
-  <input id="videoUrl" type="url" placeholder="Paste a public video URL" autocomplete="url">
-  <div class="hint">Use a video you own or have permission to process. Some platforms restrict automated downloads.</div>
+<div class="card">
+<label>Backend connection URL</label>
+<input id="backend" placeholder="https://your-backend-url.trycloudflare.com">
+<div class="small">Your backend URL is saved on this device.</div>
+</div>
 
-  <div class="grid">
-    <div><label for="count">NUMBER OF CLIPS</label>
-      <select id="count"><option>3</option><option selected>5</option><option>7</option><option>10</option></select>
-    </div>
-    <div><label for="duration">CLIP LENGTH</label>
-      <select id="duration"><option>15</option><option selected>30</option><option>45</option><option>60</option></select>
-    </div>
-  </div>
+<div class="card">
+<h3>Choose your video</h3>
 
-  <details>
-    <summary>Backend connection (setup required)</summary>
-    <label for="api">YOUR AI SERVER URL</label>
-    <input id="api" type="url" placeholder="https://your-backend.example.com">
-    <p class="hint">This server runs the video downloading, speech recognition and editing. It must be deployed before Generate can work.</p>
-  </details>
+<label>Upload a video file</label>
+<input id="video" type="file" accept="video/mp4,video/quicktime,video/x-matroska,video/webm">
+<div class="small">Supported: MP4, MOV, MKV, WEBM. Maximum 500 MB.</div>
 
-  <button id="generate">✦ GENERATE MY CLIPS</button>
-  <div id="status" class="status" role="status" aria-live="polite"></div>
-  <section id="clips" class="clips"></section>
-  <footer>Multilingual speech recognition · Original-language subtitles · 9:16 · No watermark</footer>
-</main>
+<label>Or paste a video link</label>
+<input id="videoUrl" type="url" placeholder="Paste video URL here">
+
+<label>Number of clips</label>
+<select id="count">
+<option value="2">2 clips</option>
+<option value="3" selected>3 clips</option>
+<option value="5">5 clips</option>
+<option value="10">10 clips</option>
+</select>
+
+<label>Clip duration</label>
+<select id="duration">
+<option value="15">15 seconds</option>
+<option value="30" selected>30 seconds</option>
+<option value="45">45 seconds</option>
+<option value="60">60 seconds</option>
+</select>
+
+<button id="generate" onclick="generate()">Generate Clips</button>
+<div id="status"></div>
+<div id="results"></div>
+</div>
+</div>
+
 <script>
-const $ = id => document.getElementById(id);
-const statusBox = $('status'), clipsBox = $('clips'), button = $('generate');
-let apiBase = localStorage.getItem('clipmagic_api') || '';
-$('api').value = apiBase;
-$('api').addEventListener('change', () => {
-  apiBase = $('api').value.trim().replace(/\/+$/,'');
-  localStorage.setItem('clipmagic_api', apiBase);
+const backend=document.getElementById("backend");
+const statusBox=document.getElementById("status");
+const results=document.getElementById("results");
+const button=document.getElementById("generate");
+
+backend.value=localStorage.getItem("clipmagic_backend")||"";
+
+backend.addEventListener("change",()=>{
+ localStorage.setItem("clipmagic_backend",backend.value.trim().replace(/\/+$/,""));
 });
-function showStatus(message, isError=false) {
-  statusBox.style.display='block';
-  statusBox.innerHTML = isError ? `<span class="error">${escapeHtml(message)}</span>` : escapeHtml(message);
+
+function setStatus(message){statusBox.textContent=message;}
+
+function getBase(){
+ const value=backend.value.trim().replace(/\/+$/,"");
+ if(!value) throw new Error("Please enter your backend URL first.");
+ localStorage.setItem("clipmagic_backend",value);
+ return value;
 }
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
 async function generate(){
-  const url=$('videoUrl').value.trim();
-  if(!/^https?:\/\/\S+/i.test(url)){showStatus('Please paste a valid http or https video link.',true);return;}
-  apiBase=$('api').value.trim().replace(/\/+$/,'');
-  if(!apiBase){showStatus('The AI server is not connected yet. Add your deployed backend URL in Backend connection.',true);return;}
-  button.disabled=true; clipsBox.innerHTML=''; showStatus('Sending your link to ClipMagic AI…');
-  try{
-    const res=await fetch(apiBase+'/api/jobs',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({url,clip_count:Number($('count').value),clip_seconds:Number($('duration').value)})});
-    if(!res.ok) throw new Error((await res.text()).slice(0,350));
-    const {job_id}=await res.json();
-    let finished=false;
-    while(!finished){
-      await new Promise(r=>setTimeout(r,4000));
-      const poll=await fetch(apiBase+'/api/jobs/'+encodeURIComponent(job_id));
-      if(!poll.ok) throw new Error('Could not read job status.');
-      const data=await poll.json();
-      showStatus(data.status || 'Processing…');
-      if(data.status==='Completed'){
-        finished=true; showStatus('Your clips are ready!');
-        clipsBox.innerHTML='<h2>Your clips</h2>';
-        (data.clips||[]).forEach(c=>{
-          const row=document.createElement('div');row.className='clip';
-          const info=document.createElement('div');
-          info.innerHTML=`<div class="clipname">${escapeHtml(c.name)}</div><div class="clipmeta">${escapeHtml(c.start)}s – ${escapeHtml(c.end)}s</div>`;
-          const a=document.createElement('a');a.href=apiBase+c.url;a.target='_blank';a.rel='noopener';
-          const dl=document.createElement('button');dl.textContent='Download';a.appendChild(dl);
-          row.append(info,a);clipsBox.appendChild(row);
-        });
-      } else if(data.status==='Failed'){
-        finished=true; throw new Error(data.error||'Processing failed.');
-      }
-    }
-  }catch(e){showStatus('Could not generate clips: '+e.message,true);}
-  finally{button.disabled=false;}
+ results.innerHTML="";
+ button.disabled=true;
+
+ try{
+  const base=getBase();
+  const file=document.getElementById("video").files[0];
+  const url=document.getElementById("videoUrl").value.trim();
+  const count=document.getElementById("count").value;
+  const duration=document.getElementById("duration").value;
+
+  let response;
+
+  if(file){
+   setStatus("Uploading your video... Please wait.");
+   const form=new FormData();
+   form.append("file",file);
+   form.append("clip_count",count);
+   form.append("clip_seconds",duration);
+
+   response=await fetch(base+"/api/upload",{method:"POST",body:form});
+  }else if(url){
+   setStatus("Submitting your video link...");
+   response=await fetch(base+"/api/jobs",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+     url:url,
+     clip_count:Number(count),
+     clip_seconds:Number(duration)
+    })
+   });
+  }else{
+   throw new Error("Please upload a video or paste a video link.");
+  }
+
+  const data=await response.json();
+  if(!response.ok) throw new Error(data.detail||data.error||"Could not submit video.");
+  if(!data.job_id) throw new Error("The server did not return a job ID.");
+
+  setStatus("Video submitted successfully. AI is processing it...");
+  await pollJob(base,data.job_id);
+
+ }catch(error){
+  setStatus("Error: "+error.message);
+ }finally{
+  button.disabled=false;
+ }
 }
-button.addEventListener('click',generate);
-if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+async function pollJob(base,id){
+ for(let i=0;i<360;i++){
+  await new Promise(resolve=>setTimeout(resolve,4000));
+
+  const response=await fetch(base+"/api/jobs/"+encodeURIComponent(id));
+  const data=await response.json();
+
+  if(!response.ok) throw new Error(data.detail||"Could not check job status.");
+
+  const state=String(data.status||"").toLowerCase();
+  setStatus("Status: "+(data.status||"Processing")+
+   (data.message?"\n"+data.message:""));
+
+  if(data.error) throw new Error(data.error);
+
+  if(data.clips&&data.clips.length){
+   showResults(data.clips,base);
+  }
+
+  if(["completed","complete","done","success"].includes(state)){
+   if(!data.clips||!data.clips.length){
+    showResults(data.outputs||data.results||[],base);
+   }
+   setStatus("Your clips are ready!");
+   return;
+  }
+
+  if(["failed","error"].includes(state)){
+   throw new Error(data.error||data.message||"Video processing failed.");
+  }
+ }
+ throw new Error("Processing is taking too long. Check your Colab session.");
+}
+
+function showResults(clips,base){
+ results.innerHTML="<h3>Your clips</h3>";
+
+ clips.forEach((clip,index)=>{
+  let url=typeof clip==="string"?clip:(clip.url||clip.download_url||clip.path||"");
+  if(!url)return;
+
+  if(!url.startsWith("http")&&!url.startsWith("blob:")){
+   url=base+"/"+url.replace(/^\/+/,"");
+  }
+
+  const item=document.createElement("div");
+  item.className="card";
+  item.innerHTML="<strong>Clip "+(index+1)+"</strong><br><br>";
+  const link=document.createElement("a");
+  link.href=url;
+  link.textContent="Download Clip "+(index+1);
+  link.target="_blank";
+  link.download="";
+  item.appendChild(link);
+  results.appendChild(item);
+ });
+}
 </script>
 </body>
 </html>
